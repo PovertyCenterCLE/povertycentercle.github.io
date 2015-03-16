@@ -1,149 +1,112 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-
-<head>
-	<title> Cuyahoga Age Map </title>
-	<link 
-        rel="stylesheet" 
-        href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
-    />
-    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"> </script>
-	<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.1/mapbox.js'></script>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="http://d3js.org/queue.v1.min.js"></script>
-	<script src="http://d3js.org/topojson.v1.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<link 
-	href='https://api.tiles.mapbox.com/mapbox.js/v1.6.1/mapbox.css' 
-	rel='stylesheet' />
-</head>
-
 <style>
 
-	#map { 
-		position:absolute; 
-		top:140px; 
-		bottom:10px; 
-		left:00px;
-		right:10px;
-		width:100%; 
-	}
+#map { 
+    position:absolute; 
+    top:00px; 
+    bottom:00px; 
+    left:00px;
+    right:00px;
+    width:100%; 
+}
 
-	.title {
-	  	font: 300 24px Helvetica Neue;
-	  	fill: #100;
-	  	/*fill: #666;*/
-	}
+.info {
+    padding: 6px 8px;
+    font: 16px/18px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    line-height: 1.5;
+}
+.info h4 {
+    font: 32px;
+    margin: 0 0 5px;
+    color: #777;
 
-	.explain {
-	  	font: 200 12px Helvetica Neue;
-	  	fill: #100;
-	  	/*fill: #666;*/
-	}
+}
 
-	.info {
-		padding: 6px 8px;
-		font: 14px/16px Arial, Helvetica, sans-serif;
-		background: white;
-		background: rgba(255,255,255,0.8);
-		box-shadow: 0 0 15px rgba(0,0,0,0.2);
-		border-radius: 5px;
-	}
-	.info h4 {
-		margin: 0 0 5px;
-		color: #777;
-	}
+.key path {
+    display: none;
+}
 
-	.key path {
-	  	display: none;
-	}
+.key line {
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+.key line {
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
 
-	.key line {
-	 	stroke: #000;
-	 	shape-rendering: crispEdges;
-	}
+.legend {
+    text-align: left;
+    line-height: 18px;
+    color: #555;
+}
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 10px;
+    opacity: 0.7;
+}
 
-	svg {
-	  	font: 200 12px Helvetica Neue;
-	}
-	.caption {
-		font: 200 12px Helvetica Neue;
-		fill: #100;
-	}
-
-	.key line {
-	 	stroke: #000;
-	 	shape-rendering: crispEdges;
-	}
-
-	.legend {
-		text-align: left;
-		line-height: 18px;
-		color: #555;
-	}
-	.legend i {
-		width: 18px;
-		height: 18px;
-		float: left;
-		margin-right: 8px;
-		opacity: 0.7;
-	}
+body {
+  font: 12px sans-serif;
+}
 
 </style>
 <body>
 
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"/>
+<script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"> </script>
+<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.1/mapbox.js'></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.1/mapbox.css' rel='stylesheet' />
 
 <div id="map"></div>
 <script>
+    
+Number.prototype.formatMoney = function(c, d, t){
+var n = this, 
+    c = isNaN(c = Math.abs(c)) ? 2 : c, 
+    d = d == undefined ? "." : d, 
+    t = t == undefined ? "," : t, 
+    s = n < 0 ? "-" : "", 
+    i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "", 
+    j = (j = i.length) > 3 ? j % 3 : 0;
+   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+ };
 
 L.mapbox.accessToken = 'pk.eyJ1IjoiY3dhbmc5MTIiLCJhIjoib1NKZUpiVSJ9.LciLaObuYaFzC0t-kTR6lg';
-// Replace 'examples.map-i87786ca' with your map id.
 var mapboxTiles = L.tileLayer('https://{s}.tiles.mapbox.com/v3/cwang912.he3f677p/{z}/{x}/{y}.png', {
     attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
 });
-
+    
 var map = L.map('map')
     .addLayer(mapboxTiles)
-    .setView([41.477, -81.665], 11);
+    .setView([41.447, -81.665], 10);
 
 map.keyboard.disable();
+    
+//var stamenLayer = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+//  attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
+//}).addTo(map);
 
-// variables
-
-var decadeMin = 0;
-var decadeMax = 2;
-var ageMin = 0;
-var ageMax = 3;
-var dindex = 0;
-var aindex = 0;
-
-var ages = ["0-17",
-			"18-34",
-			"35-59",
-			"60+"];
-
-var ages_text = ["0–17",
-				 "18-34",
-				 "35-59",
-				 "60+"];
-
-var decades = ["90",
-  			   "00",
-  			   "10"];
-
-var decades_text = ["1990",
-				    "2000",
-  				    "2010"];
-
-var colorMax = "hsl(215,80%,20%)"
-var colorMin = "hsl(203,53%,90%)"
-var colorMaxNum = 5000
+    
+var colorMax = "#b10026"
+var colorMin = "#ffffcc"
+var colorMaxNum = 400
 
 var color = d3.scale.linear()
  	.domain([0,colorMaxNum])
   	.range([colorMin, colorMax])
-  	.interpolate(d3.interpolateHcl);
-
+  	.interpolate(d3.interpolateHcl)
 
 var info = L.control();
 
@@ -154,9 +117,9 @@ info.onAdd = function (map) {
 };
 
 info.update = function (props) {
-	this._div.innerHTML = '<h4>Population Density by Census Tract</h4>' +  (props ?
-		'<b>' + props.NAMELSAD00 + '</b><br />' + Math.round(props[ages[aindex]+"Num"+decades[dindex]]/props['ALAND00']*2589990)+ ' people per square mile'
-		: 'Hover over a tract');
+	this._div.innerHTML = '<h4>Tax Liens by Region</h4>' +  (props ?
+         '<b>' + props.id + '</b><br />Number of parcels with tax lien certificate: ' + props.properties.parcels + '<br />Total tax lien value: $' + props.properties.total.formatMoney(2) + '<br />Average tax lien value: $' + props.properties.average_cert.formatMoney(2)
+		: 'Hover over an area');
 };
 info.addTo(map);
 
@@ -166,7 +129,7 @@ function style(feature) {
 		opacity: 1,
 		color: 'white',
 		fillOpacity: 0.7,
-		fillColor: color(feature.properties[ages[aindex]+"Num"+decades[dindex]]/feature.properties['ALAND00']*2589990)
+		fillColor: color(feature.properties.parcels)
 	};
 }
 
@@ -182,7 +145,7 @@ function highlightFeature(e) {
 	if (!L.Browser.ie && !L.Browser.opera) {
 		layer.bringToFront();
 	}
-	info.update(layer.feature.properties);
+	info.update(layer.feature);
 }
 
 var geojson;
@@ -204,8 +167,8 @@ function onEachFeature(feature, layer) {
 	});
 }
 
-$.getJSON("./cuy2.json", function(data) {
-	// console.log(data)
+$.getJSON("./taxlien_data.json", function(data) {
+    console.log(data)
     geojson = L.geoJson(data, {
     	style: style,
       	onEachFeature: onEachFeature
@@ -214,90 +177,25 @@ $.getJSON("./cuy2.json", function(data) {
     geojson.addTo(map);
  });
 
-$("#map").keydown(function( event ) {
-	console.log(event.which)
-	switch (event.which) {
-      	case 37: dindex = Math.max(decadeMin, dindex - 1); break;
-      	case 39: dindex = Math.min(decadeMax, dindex + 1); break;
-      	case 40: aindex = Math.max(ageMin, aindex - 1); break; // down
-      	case 38: aindex = Math.min(ageMax, aindex + 1); break; // up
-    }
-    geojson.setStyle(style)
-    title.transition()
-        .attr("class", "title")
-    	.text("Residents per square mile ages " + ages_text[aindex] + " in " + decades_text[dindex])
-});
+    
+    
+var legend = L.control({position: 'bottomright'});
 
-</script>
+legend.onAdd = function (map) {
 
+var div = L.DomUtil.create('div', 'info legend'),
+    grades = [0, 100, 200, 300, 400 ],
+    labels = [];
 
-<div id="title"></div>
-<script>
+for (var i = 0; i < grades.length; i++) {
+    div.innerHTML +=
+        '<i style="background:' + color(grades[i] + 1) + '"></i> ' +
+        grades[i] + '<br>' ;
+}
 
-var margin = {top: 20, right: 20, bottom: 20, left: 20},
-    padding = {top: 60, right: 60, bottom: 60, left: 60},
-    outerWidth = 960,
-    outerHeight = 500;
+return div;
+};
 
-var svg = d3.select("body").append("svg")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
-  .append("g")
-
-var title = svg.append("text")
-	.attr("class", "title") 
-	.text("Residents per square mile ages " + ages_text[aindex] +  " in " + decades_text[dindex])
-	.attr("y", 40);
-
-var explain = svg.append("text")
-	.attr("class", "explain") 
-	.text("Click the map and use the arrows to change age ranges and decades.")
-	.attr("y", 115)
-	.attr("x", 0);
-
-var ticks = d3.scale.threshold()
- 	.domain([500,2000,4000]);
-
-var x = d3.scale.linear()
-  	.domain([0,colorMaxNum])
-  	.range([0,240]);
-
-var xAxis = d3.svg.axis()
-  	.scale(x)
-  	.orient("bottom")
-  	.tickSize(12)
-    .tickValues(ticks.domain());
-
-var grad = svg.append('svg:defs')
-	.append('svg:linearGradient')
-	    .attr('id', 'gradient')
-	    .attr('x1', "0%")
-	    .attr('y1', "0%")
-	    .attr('x2', "100%")
-	    .attr('y2', "0%")
-
-grad.append('svg:stop')
-	.attr('offset', '0%')
-	.attr("stop-color", colorMin)
-	.attr("stop-opacity", 0.5);
-
-grad.append('svg:stop')
-	.attr('offset', '100%')
-	.attr("stop-color", colorMax)
-	.attr("stop-opacity", 0.5);
-
-var r = svg.append("g")
-    .attr("class", "key")
-    .attr("transform", "translate(20,70)");
-
-r.append("rect")
-    .attr("height", 8)
-    .attr("width", 270)
-    .style("fill", "url(#gradient)");
-
-r.call(xAxis).append("text")
-  .attr("class", "caption")
-  .attr("y", -6)
-  .text("Population");
+legend.addTo(map);
 
 </script>
