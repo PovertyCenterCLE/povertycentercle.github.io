@@ -124,7 +124,8 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .attr("transform", "translate(0," + height + ")")
       .call(d3.svg.axis()
         .scale(x)
-        .orient("bottom"));
+        .orient("bottom"))
+      .tickFormat(d3.time.format("%b"));
 
   svg.append("g")
       .attr("class", "axis axis--y")
@@ -145,7 +146,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
     .enter().append("path")
       .attr("d", function(d) { d.line = this; return line(d.values); })
       .attr("class", function(d) {return d.group});
-  console.log((y(cities[68].values.slice(-1)[0].value)));
+
   svg.append("text")
     .attr("transform", "translate(" + (width+5-100) + "," + (y(cities[68].values.slice(-1)[0].value)-5) + ")")
     .attr("dy", ".35em")
