@@ -30,7 +30,7 @@ svg {
   stroke-linecap: round;
   stroke-width: 1.5px;
 }
-    
+
 .suburb {
     stroke: rgba(104, 182, 76, 0.6);
 }
@@ -42,18 +42,18 @@ svg {
     stroke: rgba(155,25,0,1.0);
     stroke-dasharray: 10,10;
 }
-    
+
 .city_total {
 /*    stroke: rgba(86, 160, 213, 1.0);*/
     stroke: #005;
     stroke-dasharray: 10,10;
 }
-    
+
 .suburbs_total {
     stroke: #050;
     stroke-dasharray: 10,10;
 }
-    
+
 
 .city--hover {
   stroke: #000;
@@ -90,6 +90,11 @@ svg {
 var months,
     monthFormat = d3.time.format("%Y-%m");
 
+// var customTimeFormat = d3.time.format.multi([
+//   ["%b", function(d) { return d.getMonth(); }],
+//   ["%Y", function() { return true; }]
+// ]);
+
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
     width = 618 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -124,8 +129,9 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .attr("transform", "translate(0," + height + ")")
       .call(d3.svg.axis()
         .scale(x)
-        .orient("bottom"))
-      .tickFormat(d3.time.format("%b"));
+        .orient("bottom")
+        .ticks(4)
+      );
 
   svg.append("g")
       .attr("class", "axis axis--y")
@@ -160,7 +166,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
     .attr("text-anchor", "start")
     .style("fill", "#003")
     .text("City of Cleveland");
-    
+
   svg.append("text")
     .attr("transform", "translate(" + (width+5-100) + "," + y(cities[70].values.slice(-1)[0].value) + ")")
     .attr("dy", ".35em")
@@ -216,7 +222,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
   }
 });
 
-    
+
 function type(d, i) {
   if (!i) months = Object.keys(d).map(monthFormat.parse).filter(Number);
   var city = {
@@ -231,7 +237,7 @@ function type(d, i) {
       value: d[monthFormat(m)]
     };
   });
-    
+
   return city;
 }
 
