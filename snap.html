@@ -12,6 +12,16 @@ svg {
   font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+label {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+}
+
+.box {
+  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -81,8 +91,9 @@ svg {
 }
 
 </style>
-<label for="show-voronoi">
-</label>
+
+
+<label class="box"><input type="checkbox"> Sort values</label>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script>
@@ -154,21 +165,21 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .attr("class", function(d) {return d.group});
 
   svg.append("text")
-    .attr("transform", "translate(" + (width+5-100) + "," + (y(cities[68].values.slice(-1)[0].value)-5) + ")")
+    .attr("transform", "translate(" + (width+5-100) + "," + (y(cities.slice(-3)[0].values.slice(-1)[0].value)-5) + ")")
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
     .style("fill", "rgba(155,25,0,1.0)")
     .text("Cuyahoga County");
 
   svg.append("text")
-    .attr("transform", "translate(" + (width+5-100) + "," + y(cities[69].values.slice(-1)[0].value-.02) + ")")
+    .attr("transform", "translate(" + (width+5-100) + "," + y(cities.slice(-2)[0].values.slice(-1)[0].value-.02) + ")")
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
     .style("fill", "#003")
     .text("City of Cleveland");
 
   svg.append("text")
-    .attr("transform", "translate(" + (width+5-100) + "," + y(cities[70].values.slice(-1)[0].value) + ")")
+    .attr("transform", "translate(" + (width+5-100) + "," + y(cities.slice(-1)[0].values.slice(-1)[0].value) + ")")
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
     .style("fill", "#030")
@@ -220,6 +231,38 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
     d3.select(d.city.line).classed("city--hover", false);
     focus.attr("transform", "translate(-100,-100)");
   }
+
+  d3.selectAll("input").on("change", function() {
+    var type = this.value,
+    // I *think* "inline" is the default.
+    display = this.checked ? "inline" : "none";
+
+    svg.selectAll(".city")
+      .attr("display", display);
+  });
+
+  //
+  // d3.select("input").on("change", change);
+  //
+  // var sortTimeout = setTimeout(function() {
+  //   d3.select("input").property("checked", true).each(change);
+  // }, 200);
+  //
+  // function change() {
+  //   console.log('clicked');
+  //   a = svg.selectAll("path")
+  //       .filter(".city")
+  //       .attr("color", 'black');;
+  //  console.log(a)
+  //
+  //   // var transition = svg.transition().duration(750),
+  //       // delay = function(d, i) { return i * 50; };
+  //   //
+  //   // transition.selectAll(".bar")
+  //   //     .delay(delay)
+  //   //     .attr("x", function(d) { return x0(d.letter); });
+  // }
+
 });
 
 
