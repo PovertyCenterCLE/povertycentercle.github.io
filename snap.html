@@ -15,8 +15,8 @@ svg {
 
 label {
   position: absolute;
-  top: 50px;
-  left: 480px;
+  top: 40px;
+  left: 30px;
   font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
   vertical-align: middle;
   display: block;
@@ -75,7 +75,6 @@ label {
     stroke-dasharray: 10,10;
 }
 
-
 .city--hover {
   stroke: #000;
 }
@@ -103,7 +102,7 @@ label {
 
 #box2 {
   position: absolute;
-  top: 70px;
+  top: 60px;
   /*right: 70px;*/
 }
 
@@ -150,7 +149,7 @@ var svg = d3.select("body").append("svg")
 // load the data!
 d3.tsv("snap_norm.tsv", type, function(error, cities) {
   x.domain(d3.extent(months));
-  y.domain([0, d3.max(cities, function(c) { return d3.max(c.values, function(d) { return d.value; }); })]).nice();
+  y.domain([0.6, d3.max(cities, function(c) { return d3.max(c.values, function(d) { return d.value; }); })]).nice();
 
   // label axes
   svg.append("g")
@@ -166,7 +165,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .call(d3.svg.axis()
         .scale(y)
         .orient("left")
-        .ticks(10, "%"))
+        .ticks(8, "%"))
     .append("text")
       .attr("x", 4)
       .attr("dy", ".32em")
