@@ -109,8 +109,8 @@ label {
 </style>
 
 
-<label id="box1"><input type="checkbox"> Hide Cleveland</label>
-<label id="box2"><input type="checkbox"> Hide suburbs</label>
+<label id="box1"><input type="checkbox" checked> Show Cleveland</label>
+<label id="box2"><input type="checkbox" checked> Show suburbs</label>
 
 <!-- <label id="form" for="show-voronoi">
   Show Voronoi
@@ -290,7 +290,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .attr("r", 3.5);
   focus.append("text")
       .attr("y", -10);
-      
+
   function mouseover(d) {
     d3.select(d.city.line).classed("city--hover", true);
     d.city.line.parentNode.appendChild(d.city.line);
