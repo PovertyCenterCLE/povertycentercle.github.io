@@ -192,15 +192,6 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
     .style("fill", "#030")
     .text("Cleveland Suburbs");
 
-  // highlight focus
-  var focus = svg.append("g")
-      .attr("transform", "translate(-100,-100)")
-      .attr("class", "focus");
-  focus.append("circle")
-      .attr("r", 3.5);
-  focus.append("text")
-      .attr("y", -10);
-
   var paths = svg.append("g")
       .attr("class", "cities")
   var voronoiGroup = svg.append("g")
@@ -291,7 +282,15 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .attr("d", function(d) { d.line = this; return line(d.values); })
       .attr("class", function(d) {return d.group});
   }
-
+  // highlight focus
+  var focus = svg.append("g")
+      .attr("transform", "translate(-100,-100)")
+      .attr("class", "focus");
+  focus.append("circle")
+      .attr("r", 3.5);
+  focus.append("text")
+      .attr("y", -10);
+      
   function mouseover(d) {
     d3.select(d.city.line).classed("city--hover", true);
     d.city.line.parentNode.appendChild(d.city.line);
