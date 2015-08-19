@@ -103,7 +103,6 @@ label {
 #box2 {
   position: absolute;
   top: 60px;
-  /*right: 70px;*/
 }
 
 </style>
@@ -111,11 +110,6 @@ label {
 
 <label id="box1"><input type="checkbox" checked> Show Cleveland</label>
 <label id="box2"><input type="checkbox" checked> Show suburbs</label>
-
-<!-- <label id="form" for="show-voronoi">
-  Show Voronoi
-  <input type="checkbox" id="show-voronoi" disabled>
-</label> -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script>
@@ -202,8 +196,6 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
 
   redraw(cond1, cond2);
 
-  // redraw(false, true);
-
   d3.select("#box1")
     .property("disabled", false)
     .on("change", function() {
@@ -217,7 +209,6 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .on("change", function() {
         cond2 = !cond2;
         redraw(cond1, cond2);
-        // voronoiGroup.classed("voronoi--show", this.checked);
       });
 
 
@@ -240,22 +231,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
             return ((d.city.group!='city') && (d.city.group!='suburb'))
         }
       })), function(d) { if (d.length>0) {return "M" + d.join("L") + "Z"} })
-        // .filter(function(d) {
-        //   if (cond1==false && cond2==false) {
-        //     return true
-        //   } else if (cond1==false && cond2==true) {
-        //     // console.log(d.city.group)
-        //     // console.log(['city','county','city_total','suburbs_total'].indexOf(d.city.group)>=0)
-        //      return ['city','county','city_total','suburbs_total'].indexOf(d.city.group)>=0
-        //   } else if (cond1==true && cond2==false) {
-        //      return ['suburb','county','city_total','suburbs_total'].indexOf(d.city.group)>=0
-        //   } else if (cond1==true && cond2==true) {
-        //     return ['county','city_total','suburbs_total'].indexOf(d.city.group)>=0
-        //   }
-        // })), function(d) {
-        //   if (d.length>0) {return "M" + d.join("L") + "Z"}
-        // })
-
+        
     vg.exit().remove()
 
     vg.enter().append("path")
