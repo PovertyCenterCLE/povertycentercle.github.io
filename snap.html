@@ -23,12 +23,6 @@ label {
   padding-left: 15px;
 }
 
-/*label {
-  position: absolute;
-  top: 50px;
-  right: 50px;
-}*/
-
 .box {
   font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -117,7 +111,7 @@ label {
 var months,
     monthFormat = d3.time.format("%Y-%m");
 
-var margin = {top: 20, right: 30, bottom: 30, left: 40},
+var margin = {top: 20, right: 30, bottom: 45, left: 40},
     width = 618 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -143,7 +137,7 @@ var svg = d3.select("body").append("svg")
 // load the data!
 d3.tsv("snap_norm.tsv", type, function(error, cities) {
   x.domain(d3.extent(months));
-  y.domain([0.6, d3.max(cities, function(c) { return d3.max(c.values, function(d) { return d.value; }); })]).nice();
+  y.domain([0.75, d3.max(cities, function(c) { return d3.max(c.values, function(d) { return d.value; }); })]).nice();
 
   // label axes
   svg.append("g")
@@ -165,6 +159,10 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
       .attr("dy", ".32em")
       .style("font-weight", "bold")
       .text("Change in SNAP recipients");
+  svg.append("text")
+    .attr("x", 105)
+    .attr("y", 473)
+    .text("Visualization by the Poverty Center with data from NEO CANDO 2010+");
 
   // labels for city, county, and suburbs
   svg.append("text")
@@ -172,6 +170,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
     .attr("dy", ".35em")
     .attr("text-anchor", "start")
     .style("fill", "rgba(155,25,0,1.0)")
+    .style("text-align", "right")
     .text("Cuyahoga County");
   svg.append("text")
     .attr("transform", "translate(" + (width+5-100) + "," + y(cities.slice(-2)[0].values.slice(-1)[0].value-.02) + ")")
@@ -201,8 +200,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
     .on("change", function() {
       cond1 = !cond1;
       redraw(cond1, cond2);
-      voronoiGroup.classed("voronoi--show", this.checked);
-    });
+     });
 
   d3.select("#box2")
       .property("disabled", false)
@@ -231,7 +229,7 @@ d3.tsv("snap_norm.tsv", type, function(error, cities) {
             return ((d.city.group!='city') && (d.city.group!='suburb'))
         }
       })), function(d) { if (d.length>0) {return "M" + d.join("L") + "Z"} })
-        
+
     vg.exit().remove()
 
     vg.enter().append("path")
