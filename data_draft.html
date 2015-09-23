@@ -15,6 +15,16 @@
   fill: white;
 }
 
+h1 {
+  font: 36px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.tooltip {
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-anchor: middle;
+  /*text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;*/
+}
+
 .label {
   font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-anchor: middle;
@@ -25,6 +35,35 @@
 .node--root,
 .node--leaf {
   pointer-events: all;
+}
+
+.d3-tip {
+  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
 }
 
 /*.d3-tip {
@@ -57,9 +96,20 @@
 }*/
 
 </style>
+
 <body>
+<html>
+  <h1>Data sources</h1>
+  <div  style="width: 710px; float: left;" id="figure">
+  </div>
+  <div id="tooltip" class="tooltip" style="margin-top: 300px;">
+      <p id="value"></p>
+  </div>
+</html>
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<!-- <script src="https://rawgit.com/vijithassar/d3textwrap/master/d3textwrap.v0.js"></script> -->
 <script>
 
 function getRandomArbitrary(min, max) {
@@ -68,26 +118,27 @@ function getRandomArbitrary(min, max) {
 
 
 var margin = 20,
-    diameter = 960;
+    diameter = 700;
 
 var color = d3.scale.linear()
     .domain([-1, 5])
-    .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
+    .range(["hsl(212,50%,80%)", "hsl(128,30%,40%)"])
     .interpolate(d3.interpolateHcl);
 
 var pack = d3.layout.pack()
-    .padding(5)
+    .padding(3)
     .size([diameter - margin, diameter - margin])
-    .value(function(d) { return getRandomArbitrary(180, 320); })
+    .value(function(d) { return getRandomArbitrary(40, 620); })
 
 // var tip = d3.tip()
+//     // .filter(function(w) { return (w.depth==2); })
 //     .attr('class', 'd3-tip')
 //     .offset([-10, 0])
 //     .html(function(d) {
-//       return "<strong>Frequency:</strong> <span style='color:red'>" + 100+ "</span>";
+//       return "<span>" + d.name + "</span>";
 //     })
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#figure").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
   .append("g")
@@ -107,7 +158,19 @@ d3.json("data.json", function(error, root) {
     .enter().append("circle")
       .attr("class", function(d) { return d.parent ? (d.children ? "node" : "node node--leaf") : "node node--root"; })
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
-      .on("click", function(d) { zoom(focus == d ? root : d)});
+      .on("click", function(d) { zoom(focus == d ? root : d)})
+      // .on('mouseover', tip.show)
+      // .on("click", function(d) {
+
+              // div.style("margin-top", function() {
+              //   return d.y + "px";
+              // });
+            // }
+        // });
+      // .on('mouseout', function() {
+      //   div = d3.select("#tooltip");
+      //   div.text("");
+    // });
 
   var text = svg.selectAll("text")
       .data(nodes)
@@ -130,6 +193,25 @@ d3.json("data.json", function(error, root) {
     // console.log(focus);
     // var focus = d;
     focus = d;
+
+    console.log(focus.depth,d.depth)
+    if (focus.depth > 0 && d.depth==2) {
+      div = d3.select("#tooltip");
+      // div.style("margin-top", function() {
+      //   return d.y/2 + "px";
+      // });
+      // div.transition().duration(300).style("opacity", .5)
+      // div.transition().duration(300)
+      // .style("opacity", 1)
+      console.log(focus)
+      // console.log(d)
+      div.html("<span>Name:</span><br> " + d.name + "<br><br><span>Source:</span><br>" + d.source
+        + "<br><br><span>Frequency:</span><br>" + d.freq + "<br><br><span>Levels:</span><br>" + d.levels);
+    } else {
+      div = d3.select("#tooltip");
+      div.text("");
+    }
+
     var transition = d3.transition()
         .duration(d3.event.altKey ? 7500 : 750)
         .tween("zoom", function(d) {
@@ -137,14 +219,29 @@ d3.json("data.json", function(error, root) {
           return function(t) { zoomTo(i(t)); };
         });
     transition.selectAll("text")
-      .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
-        .style("fill-opacity", function(d) { return (d.parent === focus) ? 1 : 0; })
-        .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
-        .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
-
-
+      .filter(function(w) { return w.parent === focus || this.style.display === "inline"; })
+        .style("fill-opacity", function(w) { return (w.parent === focus) ? 1 : 0; })
+        .each("start", function(w) { if (w.parent === focus) this.style.display = "inline"; })
+        .each("end", function(w) { if (w.parent !== focus) this.style.display = "none"; });
+    transition.selectAll("text")
+      .filter(function(w) { return (w.depth==2 && focus.depth==2); })
+        .style("fill-opacity", function(w) { return (w.depth==2 && focus.depth==2) ? 1 : 0; })
+        .each("start", function(w) { if (w.depth==2 && focus.depth==2) this.style.display = "inline"; })
+        .each("end", function(w) { if (!(w.depth==2 && focus.depth==2)) this.style.display = "none"; });
     // console.log(focus);
     d3.event.stopPropagation();
+    // if (focus.depth==2) {
+    //   console.log('here')
+    //   // svg.selectAll("foreignObject")
+    //   svg.append("foreignObject")
+    //       .attr("width", 480)
+    //       .attr("height", 500)
+    //     .append("xhtml:body")
+    //       .style("font", "14px 'Helvetica Neue'")
+    //       .html("<h1>An HTML Foreign Object in SVG</h1><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu enim quam. Quisque nisi risus, sagittis quis tempor nec, aliquam eget neque. Nulla bibendum semper lorem non ullamcorper. Nulla non ligula lorem. Praesent porttitor, tellus nec suscipit aliquam, enim elit posuere lorem, at laoreet enim ligula sed tortor. Ut sodales, urna a aliquam semper, nibh diam gravida sapien, sit amet fermentum purus lacus eget massa. Donec ac arcu vel magna consequat pretium et vel ligula. Donec sit amet erat elit. Vivamus eu metus eget est hendrerit rutrum. Curabitur vitae orci et leo interdum egestas ut sit amet dui. In varius enim ut sem posuere in tristique metus ultrices.<p>Integer mollis massa at orci porta vestibulum. Pellentesque dignissim turpis ut tortor ultricies condimentum et quis nibh. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer euismod lorem vulputate dui pharetra luctus. Sed vulputate, nunc quis porttitor scelerisque, dui est varius ipsum, eu blandit mauris nibh pellentesque tortor. Vivamus ultricies ante eget ipsum pulvinar ac tempor turpis mollis. Morbi tortor orci, euismod vel sagittis ac, lobortis nec est. Quisque euismod venenatis felis at dapibus. Vestibulum dignissim nulla ut nisi tristique porttitor. Proin et nunc id arcu cursus dapibus non quis libero. Nunc ligula mi, bibendum non mattis nec, luctus id neque. Suspendisse ut eros lacus. Praesent eget lacus eget risus congue vestibulum. Morbi tincidunt pulvinar lacus sed faucibus. Phasellus sed vestibulum sapien.");
+    //
+    // }
+
   }
 
   function zoomTo(v) {
@@ -156,4 +253,17 @@ d3.json("data.json", function(error, root) {
 
 d3.select(self.frameElement).style("height", diameter + "px");
 
+// $(document).mouseup(function (e)
+// {
+//     var container = $("#tooltip");
+//
+//     if (!container.is(e.target) // if the target of the click isn't the container...
+//         && container.has(e.target).length === 0) // ... nor a descendant of the container
+//     {
+//         container.hide();
+//     }
+// });
+
+
 </script>
+</body>
